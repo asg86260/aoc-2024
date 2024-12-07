@@ -1,0 +1,35 @@
+{
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.codeActionsOnSave": {
+		"quickfix.biome": "explicit"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[css]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"cSpell.words": [
+		"axios",
+		"composables",
+		"fontawesome",
+		"fortawesome",
+		"picklist",
+		"pollyex",
+		"popovertarget",
+		"tabset",
+		"tailwindcss",
+		"unregisters",
+		"Vali",
+		"valibot",
+		"xxxs"
+	],
+	"typescript.tsdk": "node_modules/typescript/lib"
+}
