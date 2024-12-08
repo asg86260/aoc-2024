@@ -61,11 +61,8 @@ function testEquation(equation: Equation): number {
   const operatorCombinations = buildOperators(operatorCount)
 
   for (const combo of operatorCombinations) {
-    // console.log('testing: ', combo, equation.numbers)
-
     let total = 0
     for (let i = 0; i < equation.numbers.length; i++) {
-      // console.log('index', i, total, combo[i - 1], equation.numbers[i])
       if (i === 0) {
         total = equation.numbers[i]
         continue

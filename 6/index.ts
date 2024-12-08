@@ -291,7 +291,6 @@ function day6Part2() {
           break
         }
       }
-      console.log('total steps', countTrackerSteps(testTracker))
     }
   }
 
