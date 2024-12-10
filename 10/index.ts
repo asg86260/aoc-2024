@@ -12,9 +12,7 @@ type TrailNode = {
 
 type TopographicMap = Map<string, TrailNode>
 
-type TrailEnds = Set<string>
-
-type Direction = 'N' | 'E' | 'S' | 'W'
+type TrailEnds = TrailNode[]
 
 day10(input)
 
@@ -60,10 +58,9 @@ function findTrailHeads(map: TopographicMap): TrailNode[] {
 function findTrails(map: TopographicMap, trailheads: TrailNode[]): number {
   let trailScore = 0
   for (const trailhead of trailheads) {
-    const trailEnds: TrailEnds = new Set()
-    const path = new Set<Pick<TrailNode, 'x' | 'y'>>()
-    travel(map, trailhead, trailEnds, path)
-    trailScore += trailEnds.size
+    const trailEnds: TrailEnds = []
+    travel(map, trailhead, trailEnds)
+    trailScore += trailEnds.length
   }
 
   return trailScore
@@ -73,35 +70,33 @@ function travel(
   map: TopographicMap,
   position: TrailNode,
   trailEnds: TrailEnds,
-  path: Set<Pick<TrailNode, 'x' | 'y'>>,
 ) {
   const { height, north, east, south, west, x, y } = position
   let newPosition = null
 
   if (position.height === 9) {
-    console.log('found end of trail', position)
-    trailEnds.add(getPositionKey({ x, y }))
+    trailEnds.push(position)
   }
 
   if (north === height + 1) {
     newPosition = map.get(getPositionKey({ x, y: y - 1 }))
     if (!newPosition) return
-    travel(map, newPosition, trailEnds, path)
+    travel(map, newPosition, trailEnds)
   }
   if (east === height + 1) {
     newPosition = map.get(getPositionKey({ x: x + 1, y }))
     if (!newPosition) return
-    travel(map, newPosition, trailEnds, path)
+    travel(map, newPosition, trailEnds)
   }
   if (south === height + 1) {
     newPosition = map.get(getPositionKey({ x, y: y + 1 }))
     if (!newPosition) return
-    travel(map, newPosition, trailEnds, path)
+    travel(map, newPosition, trailEnds)
   }
   if (west === height + 1) {
     newPosition = map.get(getPositionKey({ x: x - 1, y }))
     if (!newPosition) return
-    travel(map, newPosition, trailEnds, path)
+    travel(map, newPosition, trailEnds)
   }
 }
 
