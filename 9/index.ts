@@ -1,5 +1,12 @@
 import { example, input } from './input'
 
+type File = {
+  id: number
+  size: number
+  start: number
+  remainingSpace: number
+}
+
 function day9(input: string) {
   const [fileSizes, freeSpaces] = splitFilesAndFreeSpace(input)
 
@@ -75,13 +82,69 @@ function checksum(blocks: string[]): number {
 
 function day9Part2(input: string) {
   const [fileSizes, freeSpaces] = splitFilesAndFreeSpace(input)
-
-  const blocks = buildFileBlocks(fileSizes, freeSpaces)
-  const compressed = compress(blocks)
-  const blockChecksum = checksum(compressed)
+  const files = buildFiles(fileSizes, freeSpaces)
+  const compressed = compressWholeFiles(files)
+  const sorted = sortByStart(compressed)
+  const blockChecksum = fileChecksum(sorted)
   console.log(blockChecksum)
 }
 
-function compressWholeFiles(blocks) {}
+function buildFiles(fileSizes: number[], freeSpaces: number[]): File[] {
+  const blocks: File[] = []
+  let currentPosition = 0
+  for (let i = 0; i < fileSizes.length; i++) {
+    const block = {
+      id: i,
+      size: fileSizes[i],
+      start: currentPosition,
+      remainingSpace: freeSpaces[i] ?? 0,
+    }
 
-day9Part2(example)
+    currentPosition += fileSizes[i] + freeSpaces[i]
+
+    blocks.push(block)
+  }
+
+  return blocks
+}
+
+//linked list would have been good to re order these efficiently.
+function compressWholeFiles(files: File[]): File[] {
+  for (const movingFile of files.toReversed()) {
+    files = sortByStart(files)
+    for (const checkingFile of files) {
+      if (checkingFile.start > movingFile.start) {
+        break
+      }
+
+      if (movingFile.size <= checkingFile.remainingSpace) {
+        movingFile.start = checkingFile.start + checkingFile.size
+        movingFile.remainingSpace =
+          checkingFile.remainingSpace - movingFile.size
+        checkingFile.remainingSpace = 0
+        break
+      }
+    }
+  }
+  return files
+}
+
+function sortByStart(files: File[]) {
+  return files.toSorted((fileA, fileB) => fileA.start - fileB.start)
+}
+
+function fileChecksum(files: File[]): number {
+  let index = 0
+  let total = 0
+
+  for (const file of files) {
+    index = file.start
+    for (let i = 0; i < file.size; i++) {
+      total += Number(file.id) * Number(index)
+      index++
+    }
+  }
+  return total
+}
+
+day9Part2(input)
