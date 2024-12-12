@@ -15,45 +15,33 @@ function buildStoneArray(input: string): number[] {
   return input.split(' ').map(Number)
 }
 
-function blink(
-  stones: number[],
-  blinks: number,
-  stoneCalcs: Map<string, number[]>,
-) {
+let count = 0
+function blink(stones: number[], blinks: number) {
   for (let i = 0; i < blinks; i++) {
     const newStones = []
 
-    console.log(stones)
-
-    const exists = stoneCalcs.get(JSON.stringify(stones))
-    if (exists) return exists
-
     for (const stone of stones) {
-      const processed = processStone(stone, stoneCalcs)
+      const processed = processStone(stone)
       newStones.push(...processed)
     }
 
-    stoneCalcs.set(JSON.stringify(stones), newStones)
-    console.log('new length: ', i, newStones.length)
     stones = newStones
+
+    console.log({ i, count })
   }
   return stones
 }
 
-function processStone(stone: number, memo: Map<number, number[]>): number[] {
-  const exists = memo.get(stone)
-  if (exists) return exists
-
-  let newStone: number[] = []
+function processStone(stone: number): number[] {
+  const newStone: number[] = []
   if (stone === 0) {
-    newStone = [1]
+    newStone.push(1)
   } else if (stone.toString().length % 2 === 0) {
-    newStone = splitNumber(stone)
+    newStone.push(...splitNumber(stone))
   } else {
-    newStone = [stone * 2024]
+    newStone.push(stone * 2024)
   }
 
-  memo.set(stone, newStone)
   return newStone
 }
 
@@ -67,21 +55,46 @@ function splitNumber(number: number): number[] {
   return [Number(firstHalf), Number(secondHalf)]
 }
 
+const pathMap = new Map<number, Map<number, number>>()
+function blink2(stone: number, blinks: number): number {
+  const currentStones = pathMap.get(stone) ?? new Map<number, number>()
+  if (currentStones.has(blinks)) {
+    return currentStones.get(blinks) ?? 0
+  }
+
+  let newCount = 0
+  const newStones = processStone(stone)
+
+  newCount += newStones.length > 1 ? 1 : 0
+
+  if (blinks > 0) {
+    for (let i = 0; i < newStones.length; i++) {
+      newCount += blink2(newStones[i], blinks - 1)
+    }
+  }
+
+  currentStones.set(blinks, newCount)
+  pathMap.set(stone, currentStones)
+
+  return newCount
+}
+
 function day11Part2(input: string) {
   console.log(input)
   const stones = buildStoneArray(input)
-  const stoneCalcs = new Map<string, number[]>()
-  const blinks = 25
-  console.log('new length', blinks, stones.length)
-  let count = 0
-  for (const stone of stones) {
-    const newStones = blink([stone], blinks, stoneCalcs)
-    count += newStones.length
-  }
 
-  console.log('number of stones', count)
+  const blinks = 75
+  count = stones.length
+
+  const t0 = performance.now()
+  console.log('starting: ', new Date())
+  let stoneCount = count
+  for (const stone of stones) {
+    stoneCount += blink2(stone, blinks - 1)
+  }
+  const t1 = performance.now()
+  console.log(`${t1 - t0} milliseconds.`)
+  console.log('number of stones', stoneCount)
 }
 
 day11Part2(input)
-
-// day11Part2(example2)
